@@ -3,10 +3,10 @@ Hackathon yay
 
 
 Team Members:
-Jerryeka
-Clifton
-Noel
-Arlington
+Jerryeka Battle,
+Clifton Heggins,
+Noel English,
+Arlington Love
 
 Date:
 November 13th - 14th
