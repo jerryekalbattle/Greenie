@@ -14,3 +14,9 @@ November 13th - 14th
 Time:
 ???
 
+Company Selection Priotization:
+1 - 
+2 - 
+3 - 
+
+Medtronic, Lenovo, CISCO, Labratory, Mateirals
