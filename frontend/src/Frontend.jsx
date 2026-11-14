@@ -11,12 +11,11 @@ function SurgeryDirectory() {
     const [searchTerm, setSearchTerm] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [activePage, setActivePage] = useState("library");
 
     async function loadSurgeries(key) {
         const response = await fetch(`${API_URL}/surgeries`, {
-            headers: {
-                "X-API-Key": key
-            }
+            headers: { "X-API-Key": key }
         });
 
         if (!response.ok) {
@@ -41,9 +40,7 @@ function SurgeryDirectory() {
 
         try {
             const response = await fetch(`${API_URL}/verify-key`, {
-                headers: {
-                    "X-API-Key": apiKey
-                }
+                headers: { "X-API-Key": apiKey }
             });
 
             if (!response.ok) {
@@ -67,9 +64,7 @@ function SurgeryDirectory() {
             const response = await fetch(
                 `${API_URL}/surgeries/${encodeURIComponent(surgeryId)}`,
                 {
-                    headers: {
-                        "X-API-Key": apiKey
-                    }
+                    headers: { "X-API-Key": apiKey }
                 }
             );
 
@@ -92,6 +87,19 @@ function SurgeryDirectory() {
         setSurgeries([]);
         setSelectedSurgery(null);
         setSearchTerm("");
+        setError("");
+        setActivePage("library");
+    }
+
+    function openLibrary() {
+        setActivePage("library");
+        setSelectedSurgery(null);
+        setError("");
+    }
+
+    function openWearables() {
+        setActivePage("wearables");
+        setSelectedSurgery(null);
         setError("");
     }
 
@@ -164,10 +172,18 @@ function SurgeryDirectory() {
                 <p className="sidebar-label">MENU</p>
 
                 <button
-                    className={`nav-item ${!selectedSurgery ? "active" : ""}`}
-                    onClick={() => setSelectedSurgery(null)}
+                    className={`nav-item ${activePage === "library" ? "active" : ""}`}
+                    onClick={openLibrary}
                 >
                     <span>⌂</span> Surgery Library
+                </button>
+
+                <button
+                    className={`nav-item ${activePage === "wearables" ? "active" : ""}`}
+                    onClick={openWearables}
+                >
+                    <span>⌚</span> Wearables
+                    <span className="nav-coming-soon">NEW</span>
                 </button>
 
                 <div className="sidebar-bottom">
@@ -186,7 +202,11 @@ function SurgeryDirectory() {
                 <header className="topbar">
                     <div>
                         <p className="eyebrow">YOUR HEALTH LEARNING SPACE</p>
-                        <h2>Greenie Dashboard</h2>
+                        <h2>
+                            {activePage === "wearables"
+                                ? "Greenie Wearables"
+                                : "Greenie Dashboard"}
+                        </h2>
                     </div>
 
                     <div className="profile-icon">🌱</div>
@@ -198,7 +218,163 @@ function SurgeryDirectory() {
                     </p>
                 )}
 
-                {!selectedSurgery ? (
+                {activePage === "wearables" ? (
+                    <section className="wearables-page">
+                        <div className="wearables-banner">
+                            <div>
+                                <span className="coming-soon-pill">
+                                    ✨ COMING SOON
+                                </span>
+
+                                <p className="eyebrow">
+                                    YOUR HEALTH, CONNECTED
+                                </p>
+
+                                <h1>Meet your connected health dashboard.</h1>
+
+                                <p>
+                                    Greenie is preparing to bring wearable
+                                    technology and health insights together
+                                    in one welcoming space.
+                                </p>
+                            </div>
+
+                            <div className="wearables-hero-icon">⌚</div>
+                        </div>
+
+                        <div className="wearables-section-heading">
+                            <div>
+                                <p className="eyebrow">YOUR HEALTH OVERVIEW</p>
+                                <h2>Health insights</h2>
+                                <p>
+                                    Example metrics that may be available
+                                    when a compatible device is connected.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="wearables-metrics">
+                            <article className="wearable-metric-card">
+                                <div className="metric-icon">💓</div>
+                                <p>HEART RATE</p>
+                                <h3>-- <span>BPM</span></h3>
+                                <span className="metric-status">
+                                    Awaiting device connection
+                                </span>
+                            </article>
+
+                            <article className="wearable-metric-card">
+                                <div className="metric-icon">👟</div>
+                                <p>DAILY STEPS</p>
+                                <h3>-- <span>steps</span></h3>
+                                <span className="metric-status">
+                                    Awaiting device connection
+                                </span>
+                            </article>
+
+                            <article className="wearable-metric-card">
+                                <div className="metric-icon">🌙</div>
+                                <p>SLEEP</p>
+                                <h3>-- <span>hours</span></h3>
+                                <span className="metric-status">
+                                    Awaiting device connection
+                                </span>
+                            </article>
+
+                            <article className="wearable-metric-card">
+                                <div className="metric-icon">🏃</div>
+                                <p>ACTIVITY</p>
+                                <h3>-- <span>minutes</span></h3>
+                                <span className="metric-status">
+                                    Awaiting device connection
+                                </span>
+                            </article>
+                        </div>
+
+                        <section className="device-section">
+                            <div className="wearables-section-heading">
+                                <div>
+                                    <p className="eyebrow">FUTURE INTEGRATIONS</p>
+                                    <h2>Connect your device</h2>
+                                    <p>
+                                        These are examples of wearable
+                                        platforms Greenie could support
+                                        through future integrations.
+                                    </p>
+                                </div>
+
+                                <span className="coming-soon-pill">
+                                    COMING SOON
+                                </span>
+                            </div>
+
+                            <div className="device-grid">
+                                <article className="device-card">
+                                    <div className="device-icon">⌚</div>
+                                    <h3>Apple Watch</h3>
+                                    <p>
+                                        Potential connection through
+                                        Apple Health.
+                                    </p>
+                                    <span>Planned integration</span>
+                                </article>
+
+                                <article className="device-card">
+                                    <div className="device-icon">💚</div>
+                                    <h3>Fitbit</h3>
+                                    <p>
+                                        Potential access to supported
+                                        fitness and wellness data.
+                                    </p>
+                                    <span>Planned integration</span>
+                                </article>
+
+                                <article className="device-card">
+                                    <div className="device-icon">⌚</div>
+                                    <h3>Garmin</h3>
+                                    <p>
+                                        Potential connection to supported
+                                        activity and health metrics.
+                                    </p>
+                                    <span>Planned integration</span>
+                                </article>
+
+                                <article className="device-card">
+                                    <div className="device-icon">📱</div>
+                                    <h3>Samsung Galaxy Watch</h3>
+                                    <p>
+                                        Potential connection through
+                                        supported Samsung health services.
+                                    </p>
+                                    <span>Planned integration</span>
+                                </article>
+                            </div>
+                        </section>
+
+                        <section className="wearables-info">
+                            <div className="info-icon">🌿</div>
+                            <div>
+                                <h3>Building a healthier future with Greenie</h3>
+                                <p>
+                                    Our goal is to make it easier to bring
+                                    supported wearable information into your
+                                    health learning experience. Actual device
+                                    connections, data permissions, and
+                                    integrations will be developed in a
+                                    future phase.
+                                </p>
+                            </div>
+                        </section>
+
+                        <p className="wearables-disclaimer">
+                            This is a demonstration dashboard. No wearable
+                            devices are connected and no live health
+                            measurements are being collected or displayed.
+                            Wearable information should not replace
+                            professional medical advice.
+                        </p>
+                    </section>
+                ) : !selectedSurgery ? (
                     <>
                         <section className="welcome-banner">
                             <div>
@@ -323,32 +499,22 @@ function SurgeryDirectory() {
                         </nav>
 
                         {selectedSurgery.surgery_info && (
-                            <section
-                                className="detail-card"
-                                id="about-surgery"
-                            >
+                            <section className="detail-card" id="about-surgery">
                                 <h2>📋 About the surgery</h2>
 
-                                {Object.entries(
-                                    selectedSurgery.surgery_info
-                                ).map(([key, value]) => (
-                                    <div className="detail-section" key={key}>
-                                        <h3>
-                                            {key.replaceAll("_", " ")}
-                                        </h3>
-                                        <p>{String(value)}</p>
-                                    </div>
-                                ))}
+                                {Object.entries(selectedSurgery.surgery_info)
+                                    .map(([key, value]) => (
+                                        <div className="detail-section" key={key}>
+                                            <h3>{key.replaceAll("_", " ")}</h3>
+                                            <p>{String(value)}</p>
+                                        </div>
+                                    ))}
                             </section>
                         )}
 
                         {selectedSurgery.medication && (
-                            <section
-                                className="detail-card"
-                                id="medication"
-                            >
+                            <section className="detail-card" id="medication">
                                 <h2>💊 Medication information</h2>
-
                                 <p>
                                     {selectedSurgery.medication.information ||
                                         "Please refer to the care team's medication instructions."}
@@ -357,30 +523,21 @@ function SurgeryDirectory() {
                         )}
 
                         {selectedSurgery.recovery && (
-                            <section
-                                className="detail-card recovery-card"
-                                id="recovery"
-                            >
+                            <section className="detail-card recovery-card" id="recovery">
                                 <h2>🌱 Recovery and follow-up</h2>
 
-                                {Object.entries(
-                                    selectedSurgery.recovery
-                                ).map(([key, value]) => (
-                                    <div className="detail-section" key={key}>
-                                        <h3>
-                                            {key.replaceAll("_", " ")}
-                                        </h3>
-                                        <p>{String(value)}</p>
-                                    </div>
-                                ))}
+                                {Object.entries(selectedSurgery.recovery)
+                                    .map(([key, value]) => (
+                                        <div className="detail-section" key={key}>
+                                            <h3>{key.replaceAll("_", " ")}</h3>
+                                            <p>{String(value)}</p>
+                                        </div>
+                                    ))}
                             </section>
                         )}
 
                         {Array.isArray(selectedSurgery.risks) && (
-                            <section
-                                className="detail-card risks-card"
-                                id="risks"
-                            >
+                            <section className="detail-card risks-card" id="risks">
                                 <h2>⚠️ Possible risks</h2>
 
                                 <ul className="risk-list">

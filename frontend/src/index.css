@@ -1002,3 +1002,319 @@ button:disabled {
     padding: 9px 11px;
   }
 }
+
+/* GREENIE WEARABLES DASHBOARD */
+
+.nav-coming-soon {
+  margin-left: auto;
+  padding: 4px 7px;
+  border-radius: 20px;
+  background: #e8f1e8;
+  color: #347653;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.wearables-page {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.wearables-banner {
+  min-height: 230px;
+  padding: 38px 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  background: linear-gradient(120deg, #e4efe2, #f1f6eb);
+  border: 1px solid #dce9dc;
+  border-radius: 23px;
+}
+
+.wearables-banner h1 {
+  max-width: 600px;
+  margin: 12px 0;
+  color: var(--green-dark);
+  font-size: clamp(27px, 4vw, 38px);
+}
+
+.wearables-banner p:not(.eyebrow) {
+  max-width: 570px;
+  color: #68796c;
+  line-height: 1.7;
+}
+
+.wearables-hero-icon {
+  min-width: 115px;
+  width: 115px;
+  height: 115px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 35px;
+  font-size: 65px;
+}
+
+.coming-soon-pill {
+  width: fit-content;
+  padding: 8px 13px;
+  display: inline-block;
+  border-radius: 25px;
+  background: #e8f1e8;
+  color: var(--green-dark);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.wearables-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.wearables-section-heading h2 {
+  margin: 0 0 8px;
+  color: var(--green-dark);
+  font-size: 25px;
+}
+
+.wearables-section-heading p:not(.eyebrow) {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.wearables-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.wearable-metric-card {
+  min-width: 0;
+  padding: 23px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 3px 12px rgba(38, 60, 50, 0.03);
+}
+
+.metric-icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  background: var(--green-light);
+  border-radius: 14px;
+  font-size: 23px;
+}
+
+.wearable-metric-card>p {
+  margin: 19px 0 9px;
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.wearable-metric-card h3 {
+  margin: 0 0 12px;
+  color: var(--green-dark);
+  font-size: 29px;
+}
+
+.wearable-metric-card h3 span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.metric-status {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.device-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.device-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.device-card {
+  padding: 23px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.device-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.device-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  background: var(--green-light);
+  border-radius: 14px;
+  font-size: 25px;
+}
+
+.device-card h3 {
+  margin: 17px 0 9px;
+  color: var(--green-dark);
+  font-size: 17px;
+}
+
+.device-card p {
+  min-height: 60px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.device-card>span {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.wearables-info {
+  padding: 25px;
+  display: flex;
+  align-items: flex-start;
+  gap: 17px;
+  background: #f1f6ef;
+  border: 1px solid #dce9dc;
+  border-radius: 17px;
+}
+
+.info-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: white;
+  border-radius: 14px;
+  font-size: 25px;
+}
+
+.wearables-info h3 {
+  margin: 2px 0 9px;
+  color: var(--green-dark);
+  font-size: 17px;
+}
+
+.wearables-info p {
+  margin: 0;
+  color: #68796c;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.wearables-disclaimer {
+  margin: -12px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+/* WEARABLES RESPONSIVE DESIGN */
+
+@media (max-width: 1100px) {
+
+  .wearables-metrics,
+  .device-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  .sidebar {
+    flex-wrap: wrap;
+  }
+
+  .sidebar-brand {
+    width: 100%;
+    padding-bottom: 10px;
+  }
+
+  .sidebar-label {
+    display: none;
+  }
+
+  .sidebar>.nav-item {
+    width: auto;
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .sidebar-bottom {
+    margin-left: auto;
+  }
+
+  .sidebar-note {
+    display: none;
+  }
+
+  .logout-button {
+    width: auto;
+    margin: 0;
+    padding: 10px 12px;
+  }
+
+  .wearables-banner {
+    min-height: auto;
+    padding: 27px 23px;
+  }
+
+  .wearables-hero-icon {
+    min-width: 65px;
+    width: 65px;
+    height: 65px;
+    border-radius: 20px;
+    font-size: 38px;
+  }
+
+  .wearables-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 420px) {
+
+  .wearables-metrics,
+  .device-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wearables-hero-icon {
+    display: none;
+  }
+
+  .wearables-banner h1 {
+    font-size: 27px;
+  }
+}
