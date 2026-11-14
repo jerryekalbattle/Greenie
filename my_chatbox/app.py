@@ -16,7 +16,10 @@ co = cohere.ClientV2(
     api_key=os.environ["COHERE_API_KEY"]
 )
 
-MEDICAL_API_URL = "http://127.0.0.1:8001"
+MEDICAL_API_URL = os.environ.get(
+    "MEDICAL_API_URL",
+    "http://127.0.0.1:8001"
+)
 MEDICAL_API_KEY = os.environ["MEDICAL_API_KEY"]
 
 conversations = {}
