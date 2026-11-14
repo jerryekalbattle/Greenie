@@ -72,13 +72,13 @@ button:disabled {
 }
 
 .login-icon {
-  width: 82px;
-  height: 82px;
+  width: 150px;
+  height: 120px;
   margin: 0 auto 22px;
   display: grid;
   place-items: center;
   background: var(--green-light);
-  border-radius: 25px;
+  border-radius: 30px;
   font-size: 40px;
 }
 
@@ -1320,7 +1320,7 @@ button:disabled {
 }
 
 .login-icon img {
-  width: 200px;
+  width: 150px;
   height: auto;
   object-fit: contain;
 }
