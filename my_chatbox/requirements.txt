@@ -3,3 +3,4 @@ flask
 cohere
 requests
 gunicorn
+flask-cors
