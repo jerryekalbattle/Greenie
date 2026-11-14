@@ -63,9 +63,9 @@ def home():
 
 surgeries = {
     "aortic-root-surgery": {
-        "name": "aortic root surgery",
+        "name": "Aortic root surgery",
         "category": "aortic surgery",
-        "description": "an educational overview of aortic root surgery.",
+        "description": "An educational overview of aortic root surgery.",
         "medication": {
             "information": "medication may include beta blockers, blood pressure medications, anticoagulants, and pain relievers depending on the patient's treatment plan."
         },
