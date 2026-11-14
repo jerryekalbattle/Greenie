@@ -28,7 +28,7 @@ function GreenieChat() {
         setLoading(true);
 
         try {
-            const response = await fetch("/chat", {
+            const response = await fetch("https://greenie-chatbot.onrender.com/chat", {
                 method: "POST",
                 credentials: "include",
                 headers: {
