@@ -2,6 +2,7 @@
 import os
 import uuid
 import cohere
+import requests
 
 from flask import Flask, render_template, request, jsonify, session
 
@@ -15,7 +16,38 @@ co = cohere.ClientV2(
     api_key=os.environ["COHERE_API_KEY"]
 )
 
+MEDICAL_API_URL = "http://127.0.0.1:8001"
+MEDICAL_API_KEY = os.environ["MEDICAL_API_KEY"]
+
 conversations = {}
+
+
+def get_surgery_information():
+    try:
+        response = requests.get(
+            f"{MEDICAL_API_URL}/surgeries",
+            headers={"X-API-Key": MEDICAL_API_KEY},
+            timeout=10
+        )
+        response.raise_for_status()
+
+        surgery_list = response.json()
+        detailed_surgeries = []
+
+        for surgery in surgery_list:
+            surgery_response = requests.get(
+                f"{MEDICAL_API_URL}/surgeries/{surgery['id']}",
+                headers={"X-API-Key": MEDICAL_API_KEY},
+                timeout=10
+            )
+            surgery_response.raise_for_status()
+            detailed_surgeries.append(surgery_response.json())
+
+        return detailed_surgeries
+
+    except requests.RequestException:
+        app.logger.exception("Medical API connection failed")
+        return []
 
 
 @app.route("/")
@@ -50,9 +82,25 @@ def chat():
     })
 
     try:
+        medical_info = get_surgery_information()
+
+        system_message = {
+            "role": "system",
+            "content": (
+                "You are Greenie, a friendly educational assistant. "
+                "Use the following cardiovascular surgery API information "
+                "when answering questions about those surgeries:\n"
+                + str(medical_info)
+                + "\nOnly make claims supported by the supplied information. "
+                "If the information does not answer a question, say so. "
+                "Do not diagnose, prescribe medication, or replace professional "
+                "medical advice."
+            )
+        }
+
         response = co.chat(
             model="command-a-03-2025",
-            messages=messages[-20:]
+            messages=[system_message] + messages[-20:]
         )
 
         bot_reply = response.message.content[0].text

@@ -17,7 +17,7 @@ function App() {
             "X-API-Key": apiKey
           }
         }
-      );
+      ); 
 
       if (!response.ok) {
         setError("Incorrect API passkey. Please try again.");

@@ -78,7 +78,7 @@ def get_surgery(surgery_id: str):
 
 
 surgeries = {
-    "": {
+    "aortic-root-surgery": {
         "name": "Aortic Root Surgery",
         "category": "Aortic Surgery",
 
