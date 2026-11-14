@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 function GreenieChat() {
     const [isOpen, setIsOpen] = useState(false);
@@ -11,7 +11,48 @@ function GreenieChat() {
         }
     ]);
     const [loading, setLoading] = useState(false);
+    const seenResponderReplies = useRef(0);
 
+    useEffect(() => {
+        async function checkForReplies() {
+            try {
+                const response = await fetch(
+                    "https://greenie-chatbot.onrender.com/chat/responder-replies",
+                    {
+                        credentials: "include"
+                    }
+                );
+
+                if (!response.ok) return;
+
+                const data = await response.json();
+                const newReplies = data.replies.slice(
+                    seenResponderReplies.current
+                );
+
+                if (newReplies.length > 0) {
+                    setMessages(previous => [
+                        ...previous,
+                        ...newReplies.map(reply => ({
+                            role: "assistant",
+                            text: reply
+                        }))
+                    ]);
+                }
+
+                seenResponderReplies.current = data.replies.length;
+
+            } catch (error) {
+                console.error("Could not check responder replies:", error);
+            }
+        }
+
+        checkForReplies();
+
+        const interval = setInterval(checkForReplies, 3000);
+
+        return () => clearInterval(interval);
+    }, []);
     async function sendMessage(event) {
         event.preventDefault();
 

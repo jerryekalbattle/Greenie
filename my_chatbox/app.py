@@ -18,9 +18,13 @@ CORS(
 )
 
 app.secret_key = os.environ["FLASK_SECRET_KEY"]
+cookie_secure = (
+    os.environ.get("SESSION_COOKIE_SECURE", "true").lower() == "true"
+)
+
 app.config.update(
-    SESSION_COOKIE_SAMESITE="None",
-    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SAMESITE="None" if cookie_secure else "Lax",
+    SESSION_COOKIE_SECURE=cookie_secure,
     SESSION_COOKIE_HTTPONLY=True
 )
 
@@ -35,6 +39,8 @@ MEDICAL_API_URL = os.environ.get(
 MEDICAL_API_KEY = os.environ["MEDICAL_API_KEY"]
 
 conversations = {}
+RESPONDER_USERNAME = os.environ.get("RESPONDER_USERNAME")
+RESPONDER_PASSWORD = os.environ.get("RESPONDER_PASSWORD")
 
 
 def get_surgery_information():
@@ -63,8 +69,27 @@ def get_surgery_information():
     except requests.RequestException:
         app.logger.exception("Medical API connection failed")
         return []
+@app.route("/responder", methods=["GET"])
+def responder_page():
+    return render_template("responder.html")
+@app.route("/responder-login", methods=["POST"])
+def responder_login():
+    data = request.get_json() or {}
 
+    username = data.get("username", "")
+    password = data.get("password", "")
 
+    if (
+        username == RESPONDER_USERNAME
+        and password == RESPONDER_PASSWORD
+    ):
+        session["is_responder"] = True
+        return jsonify({"success": True})
+
+    return jsonify({
+        "success": False,
+        "message": "Incorrect username or password."
+    }), 401
 @app.route("/")
 def home():
     if "chat_id" not in session:
@@ -72,6 +97,60 @@ def home():
 
     return render_template("index.html")
 
+@app.route("/responder/messages", methods=["GET"])
+def responder_messages():
+    if not session.get("is_responder"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    result = []
+
+    for chat_id, messages in conversations.items():
+        result.append({
+            "chat_id": chat_id,
+            "messages": messages
+        })
+
+    return jsonify({"conversations": result})
+@app.route("/responder/reply", methods=["POST"])
+def responder_reply():
+    if not session.get("is_responder"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+    chat_id = data.get("chat_id")
+    reply = data.get("reply", "").strip()
+
+    if not chat_id or not reply:
+        return jsonify({"error": "Missing chat ID or reply"}), 400
+
+    if chat_id not in conversations:
+        return jsonify({"error": "Conversation not found"}), 404
+
+    conversations[chat_id].append({
+        "role": "assistant",
+        "content": reply,
+        "responder": True
+    })
+
+    return jsonify({"success": True})
+
+@app.route("/chat/responder-replies", methods=["GET"])
+def get_responder_replies():
+    chat_id = session.get("chat_id")
+
+    if not chat_id:
+        chat_id = str(uuid.uuid4())
+        session["chat_id"] = chat_id
+
+    messages = conversations.get(chat_id, [])
+
+    replies = [
+        message["content"]
+        for message in messages
+        if message.get("responder") is True
+    ]
+
+    return jsonify({"replies": replies})
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -84,7 +163,8 @@ def chat():
     chat_id = session.get("chat_id")
 
     if not chat_id:
-        return jsonify({"reply": "Please refresh the page."}), 400
+        chat_id = str(uuid.uuid4())
+        session["chat_id"] = chat_id
 
     if chat_id not in conversations:
         conversations[chat_id] = []

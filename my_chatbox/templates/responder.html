@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greenie Responder Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #E8F1E8;
+            color: #263C32;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+        }
+
+        h1 {
+            color: #24583D;
+        }
+
+        input,
+        button {
+            padding: 12px;
+            margin: 6px 0;
+            border-radius: 7px;
+            border: 1px solid #ccc;
+        }
+
+        input {
+            width: 90%;
+        }
+
+        button {
+            background: #24583D;
+            color: white;
+            cursor: pointer;
+        }
+
+        .conversation {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+        }
+
+        .message {
+            padding: 8px;
+            margin: 5px 0;
+            background: #F1F6F0;
+            border-radius: 7px;
+            overflow-wrap: anywhere;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #status {
+            color: #A33;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <h1>🌿 Greenie Responder</h1>
+
+        <div id="login">
+            <h2>Responder Login</h2>
+
+            <form id="loginForm">
+                <input id="username" placeholder="Username" required>
+                <br>
+                <input id="password" type="password" placeholder="Password" required>
+                <br>
+                <button type="submit">Log In</button>
+            </form>
+
+            <p id="status"></p>
+        </div>
+
+        <div id="dashboard" class="hidden">
+            <h2>Incoming Conversations</h2>
+            <button id="refreshButton">Refresh Messages</button>
+            <div id="conversations"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const login = document.getElementById("login");
+        const dashboard = document.getElementById("dashboard");
+        const status = document.getElementById("status");
+        const conversations = document.getElementById("conversations");
+
+        document.getElementById("loginForm").addEventListener(
+            "submit", async function (event) {
+                event.preventDefault();
+
+                status.textContent = "Logging in...";
+
+                try {
+                    const response = await fetch("/responder-login", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            username: document.getElementById("username").value,
+                            password: document.getElementById("password").value
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        status.textContent = "Incorrect username or password.";
+                        return;
+                    }
+
+                    login.classList.add("hidden");
+                    dashboard.classList.remove("hidden");
+
+                    await loadMessages();
+
+                } catch (error) {
+                    status.textContent = "Could not connect to Greenie.";
+                }
+            }
+        );
+
+        async function loadMessages() {
+            conversations.textContent = "Loading conversations...";
+
+            try {
+                const response = await fetch("/responder/messages");
+
+                if (response.status === 401) {
+                    conversations.textContent = "Please log in again.";
+                    return;
+                }
+
+                const data = await response.json();
+                conversations.replaceChildren();
+
+                if (!data.conversations || data.conversations.length === 0) {
+                    conversations.textContent = "No conversations yet.";
+                    return;
+                }
+
+                data.conversations.forEach(conversation => {
+                    const card = document.createElement("div");
+                    card.className = "conversation";
+
+                    const heading = document.createElement("h3");
+                    heading.textContent = "Conversation: " +
+                        conversation.chat_id;
+
+                    card.appendChild(heading);
+
+                    conversation.messages.forEach(message => {
+                        const item = document.createElement("div");
+                        item.className = "message";
+                        item.textContent =
+                            message.role + ": " + message.content;
+                        card.appendChild(item);
+                    });
+
+                    const replyInput = document.createElement("input");
+                    replyInput.placeholder = "Write a reply...";
+
+                    const replyButton = document.createElement("button");
+                    replyButton.textContent = "Send Reply";
+
+                    replyButton.addEventListener("click", async () => {
+                        const reply = replyInput.value.trim();
+
+                        if (!reply) return;
+
+                        replyButton.disabled = true;
+
+                        try {
+                            const result = await fetch("/responder/reply", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    chat_id: conversation.chat_id,
+                                    reply: reply
+                                })
+                            });
+
+                            if (!result.ok) {
+                                alert("Could not send reply.");
+                                return;
+                            }
+
+                            replyInput.value = "";
+                            await loadMessages();
+
+                        } catch (error) {
+                            alert("Connection error.");
+                        } finally {
+                            replyButton.disabled = false;
+                        }
+                    });
+
+                    card.appendChild(replyInput);
+                    card.appendChild(replyButton);
+                    conversations.appendChild(card);
+                });
+
+            } catch (error) {
+                conversations.textContent = "Could not load messages.";
+            }
+        }
+
+        document.getElementById("refreshButton").addEventListener(
+            "click", loadMessages
+        );
+    </script>
+
+</body>
+
+</html>
