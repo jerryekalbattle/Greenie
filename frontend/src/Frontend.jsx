@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "http://127.0.0.1:8001";
 
 function SurgeryDirectory() {
 
@@ -201,7 +201,7 @@ function SurgeryDirectory() {
 
                     <pre>
                         {JSON.stringify(
-                            selectedSurgery.medication_info,
+                            selectedSurgery.medication,
                             null,
                             2
                         )}

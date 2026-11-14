@@ -110,31 +110,23 @@ def get_surgery(surgery_id: str):
         "id": surgery_id,
         **surgeries[surgery_id]
     }
-<<<<<<< HEAD
-
-
 
 surgeries = {
     "aortic-root-surgery": {
         "name": "Aortic Root Surgery",
         "category": "Aortic Surgery",
-
-        "description": "Educational overview of aortic root surgery.",
-
+        "description": "An educational overview of aortic root surgery.",
         "medication": {
             "information": "Medication depends on the patient's treatment plan."
         },
-
         "surgery_info": {
             "purpose": "Treat conditions affecting the aortic root.",
             "procedure": "The surgeon repairs or replaces affected tissue."
         },
-
         "recovery": {
             "overview": "Recovery varies by patient and surgical approach.",
-            "follow_up": "Follow the care team's appointment schedule."
+            "follow_up": "Follow the care team's instructions."
         },
-
         "risks": [
             "Bleeding",
             "Infection",
@@ -142,5 +134,5 @@ surgeries = {
         ]
     }
 }
-=======
->>>>>>> a20f98581e1de2706d276a4326d95d01f8bf54ee
+
+
