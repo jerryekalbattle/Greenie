@@ -179,59 +179,12 @@ function SurgeryDirectory() {
 
             <header className="header">
                 <div>
-<<<<<<< HEAD
-
-                    <h2>{selectedSurgery.name}</h2>
-
-
-                    <p>{selectedSurgery.description}</p>
-
-                    <h3>Surgery Information</h3>
-
-                    <pre>
-                        {JSON.stringify(
-                            selectedSurgery.surgery_info,
-                            null,
-                            2
-                        )}
-                    </pre>
-
-                    <h3>Medication Information</h3>
-
-                    <pre>
-                        {JSON.stringify(
-                            selectedSurgery.medication,
-                            null,
-                            2
-                        )}
-                    </pre>
-
-                    <h3>Recovery</h3>
-
-                    <pre>
-                        {JSON.stringify(
-                            selectedSurgery.recovery,
-                            null,
-                            2
-                        )}
-                    </pre>
-
-                    <h3>Risks</h3>
-
-                    <ul>
-                        {selectedSurgery.risks.map((risk, index) => (
-                            <li key={index}>{risk}</li>
-                        ))}
-                    </ul>
-
-=======
                     <div className="logo">
                         Greenie 🌿
                     </div>
                     <div className="subtitle">
                         Your cardiovascular care companion
                     </div>
->>>>>>> 9c50f2a53a62f1d3bb6cb4bb507352aaf14808a5
                 </div>
 
                 <button
@@ -289,15 +242,10 @@ function SurgeryDirectory() {
 
                     <div className="detail-section">
                         <h3>💊 Medication Information</h3>
-                        {selectedSurgery.medication_info?.map(
-                            (medication, index) => (
-                                <p key={index}>
-                                    {typeof medication === "string"
-                                        ? medication
-                                        : medication.name}
-                                </p>
-                            )
-                        )}
+                        <p>
+                            {selectedSurgery.medication?.information ||
+                                "Medication information is not available."}
+                        </p>
                     </div>
 
                     <div className="detail-section">
