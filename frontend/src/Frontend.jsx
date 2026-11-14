@@ -4,91 +4,68 @@ import { useState } from "react";
 const API_URL = "http://127.0.0.1:8001";
 
 function SurgeryDirectory() {
-
     const [apiKey, setApiKey] = useState("");
     const [authenticated, setAuthenticated] = useState(false);
-
     const [surgeries, setSurgeries] = useState([]);
     const [selectedSurgery, setSelectedSurgery] = useState(null);
-
+    const [searchTerm, setSearchTerm] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
+    async function loadSurgeries(key) {
+        const response = await fetch(`${API_URL}/surgeries`, {
+            headers: {
+                "X-API-Key": key
+            }
+        });
 
-    // Verify the API key before allowing access
-    async function verifyKey() {
+        if (!response.ok) {
+            throw new Error("Could not load the surgery library.");
+        }
 
+        const data = await response.json();
+
+        const surgeryList = Array.isArray(data)
+            ? data
+            : Array.isArray(data.surgeries)
+                ? data.surgeries
+                : Object.values(data);
+
+        setSurgeries(surgeryList);
+    }
+
+    async function verifyKey(event) {
+        event.preventDefault();
         setError("");
         setLoading(true);
 
         try {
-
             const response = await fetch(`${API_URL}/verify-key`, {
-                method: "GET",
                 headers: {
                     "X-API-Key": apiKey
                 }
             });
 
             if (!response.ok) {
-                throw new Error("Unable to retrieve surgeries.");
+                throw new Error("That access key is not valid. Please try again.");
             }
 
+            await loadSurgeries(apiKey);
             setAuthenticated(true);
-
-            await loadSurgeries();
-
         } catch (err) {
-
-            setError(err.message);
-            setAuthenticated(false);
-
+            setError(err.message || "Something went wrong. Please try again.");
         } finally {
-
             setLoading(false);
-
         }
     }
 
-
-    // Retrieve all surgeries
-    async function loadSurgeries() {
-
-        try {
-
-            const response = await fetch(`${API_URL}/surgeries`, {
-                headers: {
-                    "X-API-Key": apiKey
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error("Unable to retrieve surgeries.");
-            }
-
-            const data = await response.json();
-
-            setSurgeries(data);
-
-        } catch (err) {
-
-            setError(err.message);
-            setAuthenticated(false);
-
-        }
-    }
-
-
-    // Retrieve individual surgery information
     async function loadSurgery(surgeryId) {
-
         setError("");
-        setSelectedSurgery(null);
+        setLoading(true);
 
         try {
-
             const response = await fetch(
-                `${API_URL}/surgeries/${surgeryId}`,
+                `${API_URL}/surgeries/${encodeURIComponent(surgeryId)}`,
                 {
                     headers: {
                         "X-API-Key": apiKey
@@ -97,184 +74,333 @@ function SurgeryDirectory() {
             );
 
             if (!response.ok) {
-                const errorData = await response.text();
-
-                throw new Error(
-                    `Surgery request failed (${response.status}): ${errorData}`
-                );
-
+                throw new Error("Could not load the surgery details.");
             }
 
             const data = await response.json();
-
             setSelectedSurgery(data);
-
         } catch (err) {
-
-            setError(err.message);
-
+            setError(err.message || "Unable to load this surgery.");
+        } finally {
+            setLoading(false);
         }
     }
 
-    
-    // Login screen
+    function logout() {
+        setAuthenticated(false);
+        setApiKey("");
+        setSurgeries([]);
+        setSelectedSurgery(null);
+        setSearchTerm("");
+        setError("");
+    }
+
+    const filteredSurgeries = surgeries.filter((surgery) => {
+        const search = searchTerm.toLowerCase();
+
+        return (
+            surgery.name?.toLowerCase().includes(search) ||
+            surgery.category?.toLowerCase().includes(search) ||
+            surgery.description?.toLowerCase().includes(search)
+        );
+    });
+
     if (!authenticated) {
         return (
-            <div className="app-container">
-                <div className="login-container">
-
+            <main className="login-page">
+                <section className="login-container">
                     <div className="login-icon">🌿</div>
 
-                    <h1>Greenie</h1>
-
-                    <p className="subtitle">
-                        Your cardiovascular care companion. We care about your health so you can recover with confidence and peace of mind.
+                    <p className="eyebrow">
+                        YOUR CARDIOVASCULAR LEARNING GUIDE
                     </p>
 
-                    <h2>Welcome!</h2>
+                    <h1>Welcome to Greenie</h1>
 
-                    <p>
-                        Enter your access key to explore cardiovascular
-                        surgeries, medication information, and recovery resources.
+                    <p className="login-description">
+                        Your friendly guide to learning about cardiovascular
+                        surgeries, treatments, and recovery.
                     </p>
 
-                    <input
-                        type="password"
-                        value={apiKey}
-                        onChange={(e) => setApiKey(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter" && apiKey.trim() && !loading) {
-                                verifyKey();
-                            }
-                        }}
-                        placeholder="Enter your API passkey"
-                    />
+                    <form onSubmit={verifyKey} className="login-form">
+                        <label htmlFor="api-key">Access key</label>
 
-                    <button
-                        onClick={verifyKey}
-                        disabled={loading || !apiKey.trim()}
-                    >
-                        {loading ? "Verifying..." : "Access Greenie"}
-                    </button>
+                        <input
+                            id="api-key"
+                            type="password"
+                            value={apiKey}
+                            onChange={(event) => setApiKey(event.target.value)}
+                            placeholder="Enter your access key"
+                            required
+                        />
+
+                        <button type="submit" disabled={loading}>
+                            {loading ? "Checking..." : "Enter Greenie"}
+                        </button>
+                    </form>
 
                     {error && (
-                        <p className="error-message">{error}</p>
+                        <p className="error-message" role="alert">
+                            {error}
+                        </p>
                     )}
 
                     <p className="login-footer">
-                        🌱 Here to help you navigate your care journey.
+                        A welcoming space to learn, explore, and understand.
                     </p>
-
-                </div>
-            </div>
+                </section>
+            </main>
         );
     }
 
-
-
-    // Main directory after successful login
-    
     return (
         <div className="app-container">
-
-            <header className="header">
-                <div>
-                    <div className="logo">
-                        Greenie 🌿
-                    </div>
-                    <div className="subtitle">
-                        Your cardiovascular care companion
-                    </div>
+            <aside className="sidebar">
+                <div className="sidebar-brand">
+                    <span className="brand-icon">🌿</span>
+                    <span>Greenie</span>
                 </div>
+
+                <p className="sidebar-label">MENU</p>
 
                 <button
-                    className="logout-button"
-                    onClick={() => {
-                        setAuthenticated(false);
-                        setApiKey("");
-                        setSurgeries([]);
-                        setSelectedSurgery(null);
-                    }}
+                    className={`nav-item ${!selectedSurgery ? "active" : ""}`}
+                    onClick={() => setSelectedSurgery(null)}
                 >
-                    Log Out
+                    <span>⌂</span> Surgery Library
                 </button>
-            </header>
 
-            <div className="card">
-                <h1>Welcome to Greenie!</h1>
-                <p>
-                    Explore cardiovascular surgeries, recovery
-                    information, and medication resources.
-                </p>
-            </div>
-
-            <h2>🌱 Available Surgeries</h2>
-
-            <div className="surgery-grid">
-                {surgeries.map((surgery) => (
-                    <div className="card" key={surgery.id}>
-                        <h3>{surgery.name}</h3>
-                        <p>{surgery.category}</p>
-                        <p>{surgery.description}</p>
-
-                        <button onClick={() => loadSurgery(surgery.id)}>
-                            View Details
-                        </button>
-                    </div>
-                ))}
-            </div>
-
-            {selectedSurgery && (
-                <div className="card">
-                    <h2>{selectedSurgery.name}</h2>
-                    <p>{selectedSurgery.description}</p>
-
-                    <div className="detail-section">
-                        <h3>🫀 Surgery Information</h3>
-                        {Object.entries(selectedSurgery.surgery_info || {}).map(
-                            ([key, value]) => (
-                                <p key={key}>
-                                    <strong>{key}:</strong> {value}
-                                </p>
-                            )
-                        )}
+                <div className="sidebar-bottom">
+                    <div className="sidebar-note">
+                        <span>💚</span>
+                        <p>Knowledge makes every step easier.</p>
                     </div>
 
-                    <div className="detail-section">
-                        <h3>💊 Medication Information</h3>
-                        <p>
-                            {selectedSurgery.medication?.information ||
-                                "Medication information is not available."}
-                        </p>
-                    </div>
-
-                    <div className="detail-section">
-                        <h3>🌿 Recovery</h3>
-                        {Object.entries(selectedSurgery.recovery || {}).map(
-                            ([key, value]) => (
-                                <p key={key}>
-                                    <strong>{key}:</strong> {value}
-                                </p>
-                            )
-                        )}
-                    </div>
-
-                    <div className="detail-section">
-                        <h3>⚠️ Potential Risks</h3>
-                        <ul>
-                            {selectedSurgery.risks?.map((risk, index) => (
-                                <li key={index}>{risk}</li>
-                            ))}
-                        </ul>
-                    </div>
+                    <button className="logout-button" onClick={logout}>
+                        ↪ Log out
+                    </button>
                 </div>
-            )}
+            </aside>
 
-            {error && <p className="error-message">{error}</p>}
+            <main className="main-content">
+                <header className="topbar">
+                    <div>
+                        <p className="eyebrow">YOUR HEALTH LEARNING SPACE</p>
+                        <h2>Greenie Dashboard</h2>
+                    </div>
 
+                    <div className="profile-icon">🌱</div>
+                </header>
+
+                {error && (
+                    <p className="error-message" role="alert">
+                        {error}
+                    </p>
+                )}
+
+                {!selectedSurgery ? (
+                    <>
+                        <section className="welcome-banner">
+                            <div>
+                                <p className="eyebrow">WELCOME TO GREENIE</p>
+                                <h1>Let's learn something new.</h1>
+                                <p>
+                                    Explore cardiovascular surgeries and
+                                    understand the journey, one step at a time.
+                                </p>
+                            </div>
+
+                            <div className="welcome-illustration">🌿</div>
+                        </section>
+
+                        <section className="library-heading">
+                            <div>
+                                <p className="eyebrow">EXPLORE AND DISCOVER</p>
+                                <h2>Surgery Library</h2>
+                                <p className="section-description">
+                                    Browse the available surgery guides below.
+                                </p>
+                            </div>
+
+                            <span className="count-pill">
+                                {surgeries.length} guides
+                            </span>
+                        </section>
+
+                        <div className="search-container">
+                            <span>⌕</span>
+                            <input
+                                type="search"
+                                value={searchTerm}
+                                onChange={(event) =>
+                                    setSearchTerm(event.target.value)
+                                }
+                                placeholder="Search surgeries or categories..."
+                                aria-label="Search surgeries"
+                            />
+                        </div>
+
+                        {loading ? (
+                            <p className="empty-message">Loading...</p>
+                        ) : filteredSurgeries.length > 0 ? (
+                            <section className="surgery-grid">
+                                {filteredSurgeries.map((surgery, index) => {
+                                    const surgeryId =
+                                        surgery.id ||
+                                        surgery.surgery_id ||
+                                        surgery.slug;
+
+                                    return (
+                                        <article
+                                            className="surgery-card"
+                                            key={surgeryId || surgery.name || index}
+                                        >
+                                            <div className="surgery-card-icon">
+                                                ♥
+                                            </div>
+
+                                            <p className="card-category">
+                                                {surgery.category || "CARDIOVASCULAR"}
+                                            </p>
+
+                                            <h3>
+                                                {surgery.name || "Surgery Guide"}
+                                            </h3>
+
+                                            <p className="card-description">
+                                                {surgery.description ||
+                                                    "Explore this surgery guide and learn more."}
+                                            </p>
+
+                                            <button
+                                                className="view-button"
+                                                onClick={() => loadSurgery(surgeryId)}
+                                                disabled={!surgeryId}
+                                            >
+                                                Explore guide <span>→</span>
+                                            </button>
+                                        </article>
+                                    );
+                                })}
+                            </section>
+                        ) : (
+                            <div className="empty-message">
+                                <span>🔎</span>
+                                <h3>No surgeries found</h3>
+                                <p>Try another search term.</p>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <section className="details-page">
+                        <button
+                            className="back-button"
+                            onClick={() => setSelectedSurgery(null)}
+                        >
+                            ← Back to Surgery Library
+                        </button>
+
+                        <div className="details-heading">
+                            <div className="surgery-card-icon">♥</div>
+
+                            <p className="eyebrow">
+                                {selectedSurgery.category || "SURGERY GUIDE"}
+                            </p>
+
+                            <h1>{selectedSurgery.name}</h1>
+
+                            <p>{selectedSurgery.description}</p>
+                        </div>
+
+                        <nav
+                            className="details-navigation"
+                            aria-label="Surgery information"
+                        >
+                            <a href="#about-surgery">📋 Overview</a>
+                            <a href="#medication">💊 Medication</a>
+                            <a href="#recovery">🌱 Recovery</a>
+                            <a href="#risks">⚠️ Risks</a>
+                        </nav>
+
+                        {selectedSurgery.surgery_info && (
+                            <section
+                                className="detail-card"
+                                id="about-surgery"
+                            >
+                                <h2>📋 About the surgery</h2>
+
+                                {Object.entries(
+                                    selectedSurgery.surgery_info
+                                ).map(([key, value]) => (
+                                    <div className="detail-section" key={key}>
+                                        <h3>
+                                            {key.replaceAll("_", " ")}
+                                        </h3>
+                                        <p>{String(value)}</p>
+                                    </div>
+                                ))}
+                            </section>
+                        )}
+
+                        {selectedSurgery.medication && (
+                            <section
+                                className="detail-card"
+                                id="medication"
+                            >
+                                <h2>💊 Medication information</h2>
+
+                                <p>
+                                    {selectedSurgery.medication.information ||
+                                        "Please refer to the care team's medication instructions."}
+                                </p>
+                            </section>
+                        )}
+
+                        {selectedSurgery.recovery && (
+                            <section
+                                className="detail-card recovery-card"
+                                id="recovery"
+                            >
+                                <h2>🌱 Recovery and follow-up</h2>
+
+                                {Object.entries(
+                                    selectedSurgery.recovery
+                                ).map(([key, value]) => (
+                                    <div className="detail-section" key={key}>
+                                        <h3>
+                                            {key.replaceAll("_", " ")}
+                                        </h3>
+                                        <p>{String(value)}</p>
+                                    </div>
+                                ))}
+                            </section>
+                        )}
+
+                        {Array.isArray(selectedSurgery.risks) && (
+                            <section
+                                className="detail-card risks-card"
+                                id="risks"
+                            >
+                                <h2>⚠️ Possible risks</h2>
+
+                                <ul className="risk-list">
+                                    {selectedSurgery.risks.map((risk, index) => (
+                                        <li key={index}>{risk}</li>
+                                    ))}
+                                </ul>
+                            </section>
+                        )}
+
+                        <p className="medical-notice">
+                            Greenie provides educational information only.
+                            Always follow the advice of your qualified
+                            healthcare team for personal medical decisions.
+                        </p>
+                    </section>
+                )}
+            </main>
         </div>
     );
-
 }
 
 export default SurgeryDirectory;
