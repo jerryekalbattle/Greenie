@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import greenieLogo from "./assets/greenie-logo-transparent.png";
 
 const API_URL = "https://greenie-medical-api.onrender.com";
 
@@ -117,7 +118,9 @@ function SurgeryDirectory() {
         return (
             <main className="login-page">
                 <section className="login-container">
-                    <div className="login-icon">🌿</div>
+                    <div className="login-icon">
+                        <img src={greenieLogo} alt="Greenie Logo" />
+                    </div>
 
                     <p className="eyebrow">
                         YOUR CARDIOVASCULAR LEARNING GUIDE
@@ -165,8 +168,11 @@ function SurgeryDirectory() {
         <div className="app-container">
             <aside className="sidebar">
                 <div className="sidebar-brand">
-                    <span className="brand-icon">🌿</span>
-                    <span>Greenie</span>
+                    <img
+                        src={greenieLogo}
+                        alt="Greenie Logo"
+                        className="brand-logo"
+                    />
                 </div>
 
                 <p className="sidebar-label">MENU</p>

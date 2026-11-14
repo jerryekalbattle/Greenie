@@ -1,12 +1,12 @@
 :root {
   font-family: "Segoe UI", Arial, sans-serif;
   color: #263c32;
-  background: #f5f8f4;
+  background: #E8F1E8;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 
   --green: #347653;
-  --green-dark: #24583d;
+  --green-dark: #000000;
   --green-light: #e8f1e8;
   --sage: #dce9dc;
   --cream: #f5f8f4;
@@ -1317,4 +1317,16 @@ button:disabled {
   .wearables-banner h1 {
     font-size: 27px;
   }
+}
+
+.login-icon img {
+  width: 150px;
+  height: auto;
+  object-fit: contain;
+}
+
+.brand-logo {
+  width: 145px;
+  height: auto;
+  object-fit: contain;
 }
